@@ -1,4 +1,4 @@
-# Django Twitter Clone by Redian Marku
+# Django Based Social Networking Website
 
 
 
