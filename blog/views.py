@@ -31,8 +31,8 @@ def get_item(dictionary, key):
     return dictionary.get(key)
 
 PAGINATION_COUNT = 3
-"""
-class MutualListView(LoginRequiredMixin, ListView):
+
+"""class MutualListView(LoginRequiredMixin, ListView):
     
     model = Post
     template_name = 'blog/home.html'
@@ -56,6 +56,7 @@ class MutualListView(LoginRequiredMixin, ListView):
                 all_sugg.append(User.objects.get(username = i))
             for i in mutuals:
                 mut[User.objects.get(username = i)]=[]
+                print(mutuals[])
                 for j in mutuals[i]:                
                     mut[User.objects.get(username = i)].append(User.objects.get(username = j))
         else:
@@ -80,9 +81,9 @@ class MutualListView(LoginRequiredMixin, ListView):
        
         print(follows)
         return Post.objects.filter(author__in=follows).order_by('-date_posted')
-
-
 """
+
+
 
 
         
@@ -99,30 +100,37 @@ class PostListView(LoginRequiredMixin, ListView):
 
         data = super().get_context_data(**kwargs)
         dict ={}
+        mut = {}
         all_sugg = []
-        mut={}
         logged_user = self.request.user.username
         users = User.objects.all()
+        
         for x in users:
             dict[x.username] = [u.follow_user.username for u in Follow.objects.filter(user=x).all()]
-        sugg_list, mutuals = friend(dict,logged_user,5) 
-        for i in sugg_list:
-            all_sugg.append(User.objects.get(username = i))
-            mut[User.objects.get(username = i)]=[]
-            for j in mutuals[i]:                
-                mut[User.objects.get(username = i)].append(User.objects.get(username = j))
+        if dict[logged_user] != []:
+            sugg_list, mutuals = friend(dict,logged_user,5) 
+            for i in sugg_list:
+                all_sugg.append(User.objects.get(username = i))
+            for i in mutuals:
+                mut[User.objects.get(username = i)]=[]
+                print(mutuals[i])
+                for j in mutuals[i]:                
+                    mut[User.objects.get(username = i)].append(User.objects.get(username = j))
+        else:
+            i=0
+            total=0
+            while(total<6):
+                try:
+                    all_sugg.append(User.objects.get(id = i))
+                    total+=1
+                    
+                except:
+                    pass
+                i+=1
+                
+    
         data['all_sugg'] = all_sugg
-        print("--------------------")
-        print(all_sugg)
-
-        data['mut']=mut
-        print("--------------------")
-        print(mut)
-
-        for i in mut:
-            for j in mut[i]:
-                print(j)
-
+        data['mut'] = mut
         return data
 
     def get_queryset(self):
